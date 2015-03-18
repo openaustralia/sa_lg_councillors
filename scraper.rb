@@ -9,26 +9,36 @@ Parse.init :application_id => "LvLKTxvA2LGOTJAXTZhblO4E1f04miKymXsHRGaO",
            :api_key        => "gOVgfFHKJviaYhujxhH7kc9T9KoFmsrjwLvlSEqo",
            :quiet          => true
 
-query = Parse::Query.new("contact")
-query.limit = 1000
-contacts = query.get
-contacts.each do |contact|
-  query = Parse::Query.new("council")
-  query.eq("councilId", contact["ownerId"])
-  council = query.get.first
+def process_contacts(contacts)
+  contacts.each do |contact|
+    query = Parse::Query.new("council")
+    query.eq("councilId", contact["ownerId"])
+    council = query.get.first
 
-  record = {
-    "name" => contact["name"],
-    "position" => contact["position"],
-    "updated_at" => contact["updatedAt"],
-    "url" => contact["url"],
-    "ward" => contact["ward"]
-  }
-  if council
-    record["council"] = council["name"]
-    record["council_url"] = council["website"]
+    record = {
+      "name" => contact["name"],
+      "position" => contact["position"],
+      "updated_at" => contact["updatedAt"],
+      "url" => contact["url"],
+      "ward" => contact["ward"]
+    }
+    if council
+      record["council"] = council["name"]
+      record["council_url"] = council["website"]
+    end
+
+    p record
+    ScraperWiki.save_sqlite(["url", "name"], record)
   end
+end
 
-  p record
-  ScraperWiki.save_sqlite(["url", "name"], record)
+skip = 0
+loop do
+  contacts = Parse::Query.new("contact").tap do |q|
+    q.limit = 100
+    q.skip = skip
+  end.get
+  break if contacts.empty?
+  skip += 100
+  process_contacts(contacts)
 end
