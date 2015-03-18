@@ -9,7 +9,9 @@ Parse.init :application_id => "LvLKTxvA2LGOTJAXTZhblO4E1f04miKymXsHRGaO",
            :api_key        => "gOVgfFHKJviaYhujxhH7kc9T9KoFmsrjwLvlSEqo",
            :quiet          => false
 
-contacts = Parse::Query.new("contact").get
+query = Parse::Query.new("contact")
+query.limit = 1000
+contacts = query.get
 contacts.each do |contact|
   query = Parse::Query.new("council")
   query.eq("councilId", contact["ownerId"])
