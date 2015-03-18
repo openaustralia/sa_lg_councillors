@@ -7,7 +7,7 @@ require 'scraperwiki'
 
 Parse.init :application_id => "LvLKTxvA2LGOTJAXTZhblO4E1f04miKymXsHRGaO",
            :api_key        => "gOVgfFHKJviaYhujxhH7kc9T9KoFmsrjwLvlSEqo",
-           :quiet          => false
+           :quiet          => true
 
 query = Parse::Query.new("contact")
 query.limit = 1000
@@ -22,10 +22,13 @@ contacts.each do |contact|
     "position" => contact["position"],
     "updated_at" => contact["updatedAt"],
     "url" => contact["url"],
-    "council" => council["name"],
-    "council_url" => council["website"],
     "ward" => contact["ward"]
   }
+  if council
+    record["council"] = council["name"]
+    record["council_url"] = council["website"]
+  end
+  
   p record
   ScraperWiki.save_sqlite(["council", "name"], record)
 end
