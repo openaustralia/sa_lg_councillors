@@ -28,7 +28,7 @@ contacts.each do |contact|
     record["council"] = council["name"]
     record["council_url"] = council["website"]
   end
-  
+
   p record
-  ScraperWiki.save_sqlite(["council", "name"], record)
+  ScraperWiki.save_sqlite(["url", "name"], record)
 end
