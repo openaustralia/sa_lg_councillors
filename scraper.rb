@@ -1,4 +1,5 @@
 require 'parse-ruby-client'
+require 'scraperwiki'
 
 # It really doesn't seem to be a terribly good idea having the api_key exposed to anyone
 # but that seems to be how they're doing things. See
@@ -24,4 +25,5 @@ contacts.each do |contact|
     "ward" => contact["ward"]
   }
   p record
+  ScraperWiki.save_sqlite(["council", "name"], record)
 end
