@@ -15,12 +15,18 @@ def process_contacts(contacts)
     query.eq("councilId", contact["ownerId"])
     council = query.get.first
 
+    # This is an HTML snippet with a heap of contact details.
+    renderedContent = contact["renderedContent"]
+    # Crudely extract the email address.
+    email = renderedContent[/"mailto:([^"]+)"/, 1]
+
     record = {
       "name" => contact["name"],
       "position" => contact["position"],
       "updated_at" => contact["updatedAt"],
       "url" => contact["url"],
-      "ward" => contact["ward"]
+      "ward" => contact["ward"],
+      "email" => email
     }
     if council
       record["council"] = council["name"]
