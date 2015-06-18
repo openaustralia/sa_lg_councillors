@@ -18,7 +18,8 @@ def process_contacts(contacts)
     # This is an HTML snippet with a heap of contact details.
     renderedContent = contact["renderedContent"]
     # Crudely extract the email address.
-    email = renderedContent[/"mailto:([^"]+)"/, 1]
+    email = renderedContent[/"mailto:([^"]+)"/, 1] or
+            renderedContent[/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,4}/, 0]
 
     record = {
       "name" => contact["name"],
@@ -29,9 +30,17 @@ def process_contacts(contacts)
       "email" => email
     }
     if council
+      if council["website"] and not council["website"].empty?
+        council_url = council["website"]
+      else
+        council_url = contact["url"][/^(http:\/\/)?([^\/]+)/, 2]
+      end
       record["council"] = council["name"]
-      record["council_url"] = council["website"]
+      record["council_url"] = council_url
+    else
+      puts "No council data: #{record}"
     end
+    puts "No email found: #{record}" if not email
 
     p record
     ScraperWiki.save_sqlite(["url", "name"], record)
